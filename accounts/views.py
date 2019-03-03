@@ -42,10 +42,6 @@ def register(request):
         else: 
             messages.error(request,"The passwords do not match!")
             return redirect('register')
-
-        
-
-    
     else: 
          return render(request,'accounts/register.html')
 
@@ -53,14 +49,28 @@ def register(request):
 def login(request):
 
     if request.method == 'POST':
-        print("SUBMITTED REG")
-        return
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = auth.authenticate(username=username, password=password)
+
+        if user is not None: 
+            auth.login(request,user)
+            messages.success(request,"You are now successfully logged in!")
+            return redirect('dashboard')
+        else: 
+            messages.error(request, "Invalid credentials!")
+            return redirect('login')
     else: 
         return render(request,'accounts/login.html')
 
 
 def logout(request):
-    return redirect('index')
+
+    if request.method == 'POST':
+        auth.logout(request)
+        messages.success(request,"You have been successfully logged out")
+        return redirect('index')
 
 
 def dashboard(request):
